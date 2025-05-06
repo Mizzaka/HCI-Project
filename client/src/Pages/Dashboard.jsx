@@ -2,11 +2,11 @@ import React, { useState, Suspense } from 'react';
 import { Canvas, } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid, useGLTF, TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
-import ChairModel from '../3d_Models/ChairModel';
-import TableModel from '../3d_Models/TestTableModel';
-import SofaModel from '../3d_Models/SofaModel';
-import CupboardModel from '../3d_Models/CupboardModel';
-import CoffeeTableModel from '../3d_Models/CoffeeModel';
+import ChairModel from '../3D_Models/ChairModel';
+import TableModel from '../3D_Models/TestTableModel';
+import SofaModel from '../3D_Models/SofaModel';
+import CupboardModel from '../3D_Models/CupboardModel';
+import CoffeeTableModel from '../3D_Models/CoffeeModel';
 
 const Room = ({ dimensions, color }) => {
     const [width, height, depth] = dimensions;
