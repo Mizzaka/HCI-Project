@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react'; // Added useEffect
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid } from '@react-three/drei';
 import * as THREE from 'three';
@@ -13,6 +13,7 @@ import SofaImg from'../assets/chair_2.png';
 import CupboardImg from '../assets/chair_2.png';
 import CoffeeTableImg from '../assets/chair_2.png';
 import { LockClosedIcon, LockOpenIcon, ListBulletIcon, XMarkIcon, PlusIcon, MinusIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/solid';
+import Navbar from '../components/Navbar';
 
 const Room = ({ dimensions, color }) => {
     const [width, height, depth] = dimensions;
@@ -46,6 +47,58 @@ const Dashboard = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [toggleOrbitControl, setToggleOrbitControl] = useState(true);
     const [isPlacedFurnitureVisible, setIsPlacedFurnitureVisible] = useState(false);
+    const [isFileDropdownOpen, setIsFileDropdownOpen] = useState(false); // New state for file dropdown
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false); // State for custom save modal
+    const [templateNameInput, setTemplateNameInput] = useState(""); // State for template name input
+
+    // Initialize cart from localStorage or as an empty array
+    const [cartItems, setCartItems] = useState(() => {
+        const savedCart = localStorage.getItem('shoppingCart');
+        try {
+            return savedCart ? JSON.parse(savedCart) : [];
+        } catch (error) {
+            console.error("Error parsing cart from localStorage", error);
+            return [];
+        }
+    });
+
+    // Update localStorage whenever cartItems changes
+    useEffect(() => {
+        localStorage.setItem('shoppingCart', JSON.stringify(cartItems));
+    }, [cartItems]);
+
+    // Effect to load a selected template when the component mounts or selectedTemplateName changes
+    useEffect(() => {
+        const templateNameToLoad = localStorage.getItem('selectedTemplateName');
+        if (templateNameToLoad) {
+            console.log(`Dashboard: Attempting to load selected template: "${templateNameToLoad}"`); // Added log
+            try {
+                const savedTemplates = JSON.parse(localStorage.getItem('savedTemplates')) || [];
+                const templateToLoad = savedTemplates.find(t => t.name === templateNameToLoad);
+                if (templateToLoad) {
+                    setDimensions(templateToLoad.dimensions || [3, 2.5, 3]);
+                    setColor(templateToLoad.color || '#f5f5f5');
+                    setPlacedFurniture(templateToLoad.placedFurniture || {
+                        chair: { placed: false, position: [0, 0, 0], scale: 0.5, rotation: 0 },
+                        table: { placed: false, position: [0, 0, 0], scale: 0.7, rotation: 0 },
+                        sofa: { placed: false, position: [0, 0, 0], scale: 0.8, rotation: 0 },
+                        cupboard: { placed: false, position: [0, 0, 0], scale: 0.8, rotation: 0 },
+                        coffeeTable: { placed: false, position: [0, 0, 0], scale: 0.7, rotation: 0 },
+                    });
+                    // Optionally, clear the selected template name from localStorage after loading
+                    // localStorage.removeItem('selectedTemplateName'); 
+                    alert(`Template "${templateNameToLoad}" loaded successfully!`);
+                } else {
+                    alert(`Template "${templateNameToLoad}" not found.`);
+                }
+            } catch (error) {
+                console.error("Error loading template from localStorage:", error);
+                alert("Failed to load template. See console for details.");
+            }
+            // Clear the name from localStorage whether it was found or not, to prevent re-loading on refresh without explicit selection
+            localStorage.removeItem('selectedTemplateName');
+        }
+    }, []); // Runs once on mount, or you might add a dependency if selectedTemplateName could change by other means
 
     const [placedFurniture, setPlacedFurniture] = useState({
         chair: { placed: false, position: [0, 0, 0], scale: 0.5, rotation: 0 },
@@ -93,10 +146,23 @@ const Dashboard = () => {
     };
 
     const handleFurnitureSelect = (furniture) => {
-        setSelectedFurniture(furniture);
-        if (furniture !== 'none' && !placedFurniture[furniture].placed) {
-            setPlacedFurniture(prev => ({ ...prev, [furniture]: { ...prev[furniture], placed: true } }));
+        setSelectedFurniture(furniture); // For styling the "Add Furniture" item itself
+
+        if (furniture !== 'none') {
+            // If the furniture is not yet placed, mark it as placed.
+            if (!placedFurniture[furniture].placed) {
+                setPlacedFurniture(prev => ({
+                    ...prev,
+                    [furniture]: { ...prev[furniture], placed: true }
+                }));
+            }
+            // Always set the clicked item as the selected item for the details panel.
             setSelectedItem(furniture);
+            
+            // If an item is selected from the palette, ensure the "Placed Furniture" panel is visible.
+            if (!isPlacedFurnitureVisible) {
+                setIsPlacedFurnitureVisible(true);
+            }
         }
     };
 
@@ -105,9 +171,90 @@ const Dashboard = () => {
     const toggleSizeModal = () => { toggleModal(); };
     const togglePlacedFurniturePanel = () => { setIsPlacedFurnitureVisible(!isPlacedFurnitureVisible); };
 
+    const toggleFileDropdown = () => { // New function to toggle file dropdown
+        setIsFileDropdownOpen(!isFileDropdownOpen);
+    };
+
+    const handleNewFile = () => {
+        // Placeholder for "New File" functionality
+        console.log("New File clicked");
+        // Resetting the state for a new file
+        setDimensions([3, 2.5, 3]);
+        setColor('#f5f5f5');
+        setSelectedFurniture('none');
+        setSelectedItem(null);
+        setPlacedFurniture({
+            chair: { placed: false, position: [0, 0, 0], scale: 0.5, rotation: 0 },
+            table: { placed: false, position: [0, 0, 0], scale: 0.7, rotation: 0 },
+            sofa: { placed: false, position: [0, 0, 0], scale: 0.8, rotation: 0 },
+            cupboard: { placed: false, position: [0, 0, 0], scale: 0.8, rotation: 0 },
+            coffeeTable: { placed: false, position: [0, 0, 0], scale: 0.7, rotation: 0 },
+        });
+        setIsFileDropdownOpen(false); // Close dropdown after action
+        alert("New file created. The scene has been reset.");
+    };
+
+    const handleSaveFile = () => {
+        setIsFileDropdownOpen(false); // Close the file dropdown first
+        setTemplateNameInput(""); // Reset input field when opening modal
+        setIsSaveModalOpen(true); // Open the custom save modal
+    };
+
+    const handleConfirmSaveTemplate = () => {
+        const fileName = templateNameInput.trim();
+        if (fileName !== "") {
+            const sceneState = {
+                name: fileName,
+                dimensions,
+                color,
+                placedFurniture,
+                timestamp: new Date().toISOString(),
+            };
+
+            try {
+                const savedTemplates = JSON.parse(localStorage.getItem('savedTemplates')) || [];
+                const existingTemplateIndex = savedTemplates.findIndex(template => template.name === sceneState.name);
+                if (existingTemplateIndex > -1) {
+                    savedTemplates[existingTemplateIndex] = sceneState;
+                    alert(`Template "${sceneState.name}" updated successfully!`);
+                } else {
+                    savedTemplates.push(sceneState);
+                    alert(`Template "${sceneState.name}" saved successfully!`);
+                }
+                localStorage.setItem('savedTemplates', JSON.stringify(savedTemplates));
+                console.log("File saved:", sceneState);
+            } catch (error) {
+                console.error("Error saving template to localStorage:", error);
+                alert("Failed to save template. See console for details.");
+            }
+            setIsSaveModalOpen(false); // Close modal after saving
+            setTemplateNameInput(""); // Reset input field
+        } else {
+            alert("Template name cannot be empty.");
+        }
+    };
+
     const handleAddToCart = (e, furnitureType) => {
-        e.stopPropagation();
-        console.log(`Added ${furnitureType} to cart`);
+        e.stopPropagation(); // Prevents other click handlers if the button is inside a clickable card
+        setCartItems(prevCartItems => {
+            const existingItemIndex = prevCartItems.findIndex(item => item.type === furnitureType);
+            if (existingItemIndex > -1) {
+                // Item already in cart, increment quantity
+                const updatedCartItems = prevCartItems.map((item, index) =>
+                    index === existingItemIndex
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                );
+                return updatedCartItems;
+            } else {
+                // Item not in cart, add as new item
+                // You can add more details like price, image, etc., if needed for the cart page
+                return [...prevCartItems, { type: furnitureType, quantity: 1, id: `${furnitureType}-${Date.now()}` }];
+            }
+        });
+        // Optional: Provide user feedback
+        alert(`${furnitureType.charAt(0).toUpperCase() + furnitureType.slice(1)} has been added to your cart.`);
+        console.log("Cart updated:", cartItems); // Note: This will log the cart state before the update due to async nature of setState. The useEffect will log the persisted state.
     };
 
     const handlePreciseRotationChange = (itemType, degrees) => {
@@ -126,39 +273,34 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col h-screen font-sans text-black">
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-[#104F7E]">Furniture plus</h1>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-2">
-              <button className="px-4 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors">Add Staff</button>
-              <button className="px-4 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors">Templates</button>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </button>
-              <div className="h-10 w-10 bg-[#104F7E] rounded-full flex items-center justify-center text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
+      <Navbar />
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-12">
-            <div className="flex items-center space-x-2">
-              <button className="px-3 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors">File</button>
+            <div className="flex items-center space-x-2 relative"> {/* Added relative positioning for dropdown */}
+              <button 
+                onClick={toggleFileDropdown} // Updated onClick handler
+                className="px-3 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors"
+              >
+                File
+              </button>
+              {isFileDropdownOpen && ( // Conditional rendering for the dropdown
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-200">
+                  <button
+                    onClick={handleNewFile}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#104F7E]"
+                  >
+                    New File
+                  </button>
+                  <button
+                    onClick={handleSaveFile}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#104F7E]"
+                  >
+                    Save
+                  </button>
+                  {/* Add more dropdown items here if needed */}
+                </div>
+              )}
               <button className="px-3 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors">Edit</button>
               <span className="text-[#104F7E] font-medium ml-4">My Project 2</span>
             </div>
@@ -191,6 +333,49 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Custom Save Template Modal */}
+      {isSaveModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
+            <div className="bg-[#104F7E] rounded-t-xl px-6 py-4">
+              <h3 className="text-xl font-medium text-white">Save Template</h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label htmlFor="templateName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Template Name:
+                </label>
+                <input
+                  type="text"
+                  id="templateName"
+                  value={templateNameInput}
+                  onChange={(e) => setTemplateNameInput(e.target.value)}
+                  placeholder="Enter a name for your template"
+                  className="w-full px-4 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-[#104F7E]/50 focus:border-[#104F7E] transition-all"
+                />
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setIsSaveModalOpen(false);
+                  setTemplateNameInput(""); // Reset input field on cancel
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-100 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSaveTemplate}
+                className="px-5 py-2 bg-[#104F7E] hover:bg-[#0d3c61] text-white text-sm rounded-full shadow-md hover:shadow-lg transition-all"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         <div className="w-[300px] bg-gray-100 p-5 overflow-y-auto flex-shrink-0">
@@ -268,7 +453,6 @@ const Dashboard = () => {
             <div className="mt-5">
                 <h3 className="mt-5 text-black text-lg font-medium mb-3">Add Furniture</h3>
                 <div className="grid grid-cols-2 gap-3 mt-3">
-                    {!placedFurniture.chair.placed && (
                     <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'chair' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('chair')}>
                         <img src={ChairImg} alt="Chair" className="w-full h-20 object-contain mb-2" />
                         <span className="text-sm text-center font-medium mb-2 text-black">Chair</span>
@@ -276,8 +460,6 @@ const Dashboard = () => {
                             Add to Cart
                         </button>
                     </div>
-                    )}
-                     {!placedFurniture.table.placed && (
                     <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'table' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('table')}>
                         <img src={TableImg} alt="Table" className="w-full h-20 object-contain mb-2" />
                         <span className="text-sm text-center font-medium mb-2 text-black">Table</span>
@@ -285,8 +467,6 @@ const Dashboard = () => {
                             Add to Cart
                         </button>
                     </div>
-                    )}
-                     {!placedFurniture.sofa.placed && (
                     <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'sofa' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('sofa')}>
                         <img src={SofaImg} alt="Sofa" className="w-full h-20 object-contain mb-2" />
                         <span className="text-sm text-center font-medium mb-2 text-black">Sofa</span>
@@ -294,8 +474,6 @@ const Dashboard = () => {
                             Add to Cart
                         </button>
                     </div>
-                    )}
-                     {!placedFurniture.cupboard.placed && (
                     <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'cupboard' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('cupboard')}>
                         <img src={CupboardImg} alt="Cupboard" className="w-full h-20 object-contain mb-2" />
                         <span className="text-sm text-center font-medium mb-2 text-black">Cupboard</span>
@@ -303,8 +481,6 @@ const Dashboard = () => {
                             Add to Cart
                         </button>
                     </div>
-                    )}
-                     {!placedFurniture.coffeeTable.placed && (
                     <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'coffeeTable' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('coffeeTable')}>
                         <img src={CoffeeTableImg} alt="Coffee Table" className="w-full h-20 object-contain mb-2" />
                         <span className="text-sm text-center font-medium mb-2 text-black">Coffee Table</span>
@@ -312,7 +488,6 @@ const Dashboard = () => {
                             Add to Cart
                         </button>
                     </div>
-                    )}
                 </div>
             </div>
         </div>

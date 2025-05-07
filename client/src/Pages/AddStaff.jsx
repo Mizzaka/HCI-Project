@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ShoppingCart, User } from 'lucide-react';
-
+import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../lib/axios';
 

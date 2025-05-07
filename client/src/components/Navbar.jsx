@@ -22,7 +22,7 @@ export default function Navbar() {
             onClick={handleLogoClick}
             className="text-2xl font-bold text-[rgba(16,79,126,1)] cursor-pointer hover:text-[rgba(16,79,126,0.8)]"
           >
-            Furniture plus
+            Nova Living
           </h1>
 
           {/* Navigation buttons - Center aligned */}
@@ -32,7 +32,7 @@ export default function Navbar() {
                 Add Staff
               </a>
             )}
-            <a href="#" className="text-gray-700 hover:text-blue-800">
+            <a href="/template" className="text-gray-700 hover:text-blue-800">
               Templates
             </a>
             <button className='text-gray-700' onClick={logout}>Log out</button>

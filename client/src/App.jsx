@@ -4,6 +4,7 @@ import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AddStaffPage from './pages/AddStaff';
 import TestFurnitureDesigner from './pages/TestDashboard';
+import FurnitureTemplate from './pages/Template';
 import CartPage from './pages/Cart';
 import CheckoutPage from './pages/Checkout';
 import { useAuthStore } from './store/useAuthStore';
@@ -31,6 +32,9 @@ function App() {
         <Route path="/cart" element={authUser? <CartPage /> : <Navigate to='/login' />} /> 
         <Route path="/checkout" element={authUser? <CheckoutPage /> : <Navigate to='/login' />} /> 
         <Route path="/test" element={<TestFurnitureDesigner />} /> 
+        <Route path="/template" element={<FurnitureTemplate/>} />
+        <Route path="/dashboard" element={authUser? <Dashboard /> : <Navigate to='/login' />} />
+
       </Routes>
 
       <Toaster position="top-right"/>
