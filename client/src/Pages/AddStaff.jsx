@@ -1,32 +1,22 @@
-import { useState } from 'react';
-import { ShoppingCart, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingCart, User, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../lib/axios';
 
 export default function AddStaffPage() {
-  // const [formData, setFormData] = useState({
-  //   firstName: 'John',
-  //   lastName: 'Doe',
-  //   email: 'johndoe@gmail.com',
-  //   phoneNumber: '0112224448',
-  //   password: '********',
-  //   confirmPassword: '********'
-  // });
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData(prevState => ({
-  //     ...prevState,
-  //     [name]: value
-  //   }));
-  // };
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [animateIn, setAnimateIn] = useState(false);
+
+  // Animation trigger
+  useEffect(() => {
+    setAnimateIn(true);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,118 +45,130 @@ export default function AddStaffPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      {/* <header className="border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#104F7E]">Furniture plus</h1>
-          
-          <div className="flex items-center space-x-6">
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-800 hover:text-[#104F7E]">Add Staff</a>
-              <a href="#" className="text-gray-800 hover:text-[#104F7E]">Templates</a>
-            </nav>
-            
-            <div className="flex items-center space-x-4">
-              <a href="#" className="text-gray-800">
-                <ShoppingCart size={24} />
-              </a>
-              <a href="#" className="bg-blue-300 rounded-full p-2">
-                <User size={24} className="text-white" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </header> */}
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-3xl">
-        <h2 className="text-3xl font-bold text-center mb-8">Add staff member</h2>
-        
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block mb-2 font-medium">First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                placeholder='John'
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full p-3 bg-gray-300 rounded"
-              />
-            </div>
-            
-            <div>
-              <label className="block mb-2 font-medium">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                placeholder='Doe'
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full p-3 bg-gray-300 rounded"
-              />
-            </div>
+        <div 
+          className={`transition-all duration-700 transform ${
+            animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`}
+        >
+          <div className="flex items-center justify-center mb-8">
+            <h2 className="text-3xl font-bold text-center text-[#163E43] relative">
+              Add Staff Member
+              <div className="h-1 w-24 bg-[#163E43] mt-2 mx-auto rounded-full"></div>
+            </h2>
           </div>
           
-          <div className="mb-6">
-            <label className="block mb-2 font-medium">Email</label>
-            <input
-              type="email"
-              placeholder='johndoe@gmail.com'
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 bg-gray-300 rounded"
-            />
+          <div className="bg-white rounded-lg shadow-lg p-8 transition-all duration-500 hover:shadow-xl">
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className={`transition-all duration-500 delay-100 transform ${
+                  animateIn ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
+                }`}>
+                  <label className="block mb-2 font-medium text-[#163E43]">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder='John'
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:border-[#163E43] focus:ring-2 focus:ring-[#163E43] focus:ring-opacity-20 transition-all duration-300 outline-none"
+                  />
+                </div>
+                
+                <div className={`transition-all duration-500 delay-200 transform ${
+                  animateIn ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
+                }`}>
+                  <label className="block mb-2 font-medium text-[#163E43]">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder='Doe'
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:border-[#163E43] focus:ring-2 focus:ring-[#163E43] focus:ring-opacity-20 transition-all duration-300 outline-none"
+                  />
+                </div>
+              </div>
+              
+              <div className={`mb-6 transition-all duration-500 delay-300 transform ${
+                animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}>
+                <label className="block mb-2 font-medium text-[#163E43]">Email</label>
+                <input
+                  type="email"
+                  placeholder='johndoe@gmail.com'
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:border-[#163E43] focus:ring-2 focus:ring-[#163E43] focus:ring-opacity-20 transition-all duration-300 outline-none"
+                />
+              </div>
+              
+              <div className={`mb-6 transition-all duration-500 delay-400 transform ${
+                animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}>
+                <label className="block mb-2 font-medium text-[#163E43]">Phone Number</label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  placeholder='0112224448'
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:border-[#163E43] focus:ring-2 focus:ring-[#163E43] focus:ring-opacity-20 transition-all duration-300 outline-none"
+                />
+              </div>
+              
+              <div className={`mb-6 transition-all duration-500 delay-500 transform ${
+                animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}>
+                <label className="block mb-2 font-medium text-[#163E43]">Password</label>
+                <input
+                  type="password"
+                  placeholder='*****'
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:border-[#163E43] focus:ring-2 focus:ring-[#163E43] focus:ring-opacity-20 transition-all duration-300 outline-none"
+                />
+              </div>
+              
+              <div className={`mb-8 transition-all duration-500 delay-600 transform ${
+                animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}>
+                <label className="block mb-2 font-medium text-[#163E43]">Confirm Password</label>
+                <input
+                  type="password"
+                  placeholder='*****'
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:border-[#163E43] focus:ring-2 focus:ring-[#163E43] focus:ring-opacity-20 transition-all duration-300 outline-none"
+                />
+              </div>
+              
+              <div className={`transition-all duration-500 delay-700 transform ${
+                animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}>
+                <button 
+                  type="submit" 
+                  className="w-full bg-[#163E43] text-white py-4 rounded-lg font-medium text-lg hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center group"
+                >
+                  <span>Add Staff</span>
+                  <ChevronRight className="ml-2 transition-transform duration-300 transform group-hover:translate-x-1" size={20} />
+                </button>
+              </div>
+            </form>
           </div>
-          
-          <div className="mb-6">
-            <label className="block mb-2 font-medium">Phone Number</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              placeholder='0112224448'
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full p-3 bg-gray-300 rounded"
-            />
-          </div>
-          
-          <div className="mb-6">
-            <label className="block mb-2 font-medium">Password</label>
-            <input
-              type="password"
-              placeholder='*****'
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 bg-gray-300 rounded"
-            />
-          </div>
-          
-          <div className="mb-8">
-            <label className="block mb-2 font-medium">Confirm Password</label>
-            <input
-              type="password"
-              placeholder='*****'
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-3 bg-gray-300 rounded"
-            />
-          </div>
-          
-          <button 
-            type="submit" 
-            className="w-full bg-[#104F7E] text-white py-4 rounded font-medium text-lg hover:bg-[#0d4269] transition-colors"
-          >
-            Add staff
-          </button>
-        </form>
+        </div>
       </main>
+
+      {/* Decorative elements */}
+      <div className="fixed bottom-0 left-0 w-32 h-32 bg-[#163E43] opacity-10 rounded-tr-full"></div>
+      <div className="fixed top-32 right-0 w-48 h-48 bg-[#163E43] opacity-5 rounded-bl-full"></div>
     </div>
   );
 }
