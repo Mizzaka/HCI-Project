@@ -1,34 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
+import Home from './pages/Home';
+import LoginPage from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import AddStaffPage from './pages/AddStaff';
+import TestFurnitureDesigner from './pages/TestDashboard';
+import FurnitureTemplate from './pages/Template';
+import CartPage from './pages/Cart';
+import CheckoutPage from './pages/Checkout';
+import { useAuthStore } from './store/useAuthStore';
+import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();  
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
+
+  if (isCheckingAuth && !authUser) {
+    return (<div>loading...</div>)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className=' text-7xl'>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route index element={authUser? <Dashboard /> : <Navigate to='/login' />} />
+        {/* <Route path="/home" element={<Home />} /> */}
+        <Route path="/login" element={!authUser? <LoginPage /> : <Navigate to='/' />} />
+        <Route path="/add-staff" element={(authUser && authUser?.role === 'admin') ? <AddStaffPage /> : <Navigate to='/' />} />
+        <Route path="/cart" element={authUser? <CartPage /> : <Navigate to='/login' />} /> 
+        <Route path="/checkout" element={authUser? <CheckoutPage /> : <Navigate to='/login' />} /> 
+        <Route path="/test" element={<TestFurnitureDesigner />} /> 
+        <Route path="/template" element={<FurnitureTemplate/>} />
+        <Route path="/dashboard" element={authUser? <Dashboard /> : <Navigate to='/login' />} />
+
+      </Routes>
+
+      <Toaster position="top-right"/>
+    </BrowserRouter>
   )
 }
 

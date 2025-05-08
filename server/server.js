@@ -9,7 +9,7 @@ const userRoutes = require('./routes/userRoute');
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true
 }));
