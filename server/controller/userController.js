@@ -46,6 +46,40 @@ const staffRegister = async (req, res) => {
     }
 }
 
+const userRegister = async (req, res) => {
+    const { name, email, password, phone } = req.body;
+    const convEmail = email.toLowerCase();
+
+    try {
+        if (!name || !email || !password) {
+            return res.status(400).json({ msg: "All fields are required" });
+        }    
+
+        const user = await User.findOne({ email: convEmail });
+        if (user) return res.status(400).json({ msg: "Email already exists" });
+
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+
+        const newUser = new User({
+            name,
+            email: convEmail,
+            password: hash,
+            phone: phone,
+            role: 'customer'
+        });
+
+        if (newUser) {
+            await newUser.save();
+            res.status(201).json({ id: newUser._id });            
+        } else {
+            res.status(500).json({ msg: "Account creation failed" });
+        }
+    } catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+}
+
 const login = async (req, res) => {
     const { email, password } = req.body;
     const cookies = req.cookies;
@@ -103,4 +137,4 @@ const checkAuth = async (req, res) => {
     }
 }
 
-module.exports = { staffRegister, login, logout, checkAuth };
+module.exports = { staffRegister, userRegister, login, logout, checkAuth };
