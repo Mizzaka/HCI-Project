@@ -24,7 +24,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/template" index element={authUser? <FurnitureTemplate /> : <Navigate to='/login' />} />
+        <Route index element={authUser? <FurnitureTemplate /> : <Navigate to='/login' />} />
+        <Route path="/template" element={authUser? <FurnitureTemplate /> : <Navigate to='/login' />} />
         <Route path="/login" element={!authUser? <LoginPage /> : <Navigate to='/' />} />
         <Route path="/register" element={!authUser? <Register /> : <Navigate to='/' />} />
         <Route path="/add-staff" element={(authUser && authUser?.role === 'admin') ? <AddStaffPage /> : <Navigate to='/' />} />

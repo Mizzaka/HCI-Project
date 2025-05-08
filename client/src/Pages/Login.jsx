@@ -12,7 +12,7 @@ export default function LoginPage() {
   const { login } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/dashboard';
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
