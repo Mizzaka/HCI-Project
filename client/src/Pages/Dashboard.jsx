@@ -8,12 +8,15 @@ import SofaModel from '../3D_Models/SofaModel';
 import CupboardModel from '../3D_Models/CupboardModel';
 import CoffeeTableModel from '../3D_Models/CoffeeModel';
 import ChairImg from '../assets/chair_2.png';
-import TableImg from '../assets/chair_2.png';
-import SofaImg from'../assets/chair_2.png';
-import CupboardImg from '../assets/chair_2.png';
-import CoffeeTableImg from '../assets/chair_2.png';
+import TableImg from '../assets/table2.png';
+import SofaImg from'../assets/sofa.png';
+import CupboardImg from '../assets/cupboard.png';
+import CoffeeTableImg from '../assets/coffee_table.png';
 import { LockClosedIcon, LockOpenIcon, ListBulletIcon, XMarkIcon, PlusIcon, MinusIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/solid';
 import Navbar from '../components/Navbar';
+import TopView2D from '../components/TopView2D';
+import FrontView2D from '../components/FrontView2D';
+import SideView2D from '../components/SideView2D';
 
 const Room = ({ dimensions, color }) => {
     const [width, height, depth] = dimensions;
@@ -50,6 +53,8 @@ const Dashboard = () => {
     const [isFileDropdownOpen, setIsFileDropdownOpen] = useState(false); // New state for file dropdown
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false); // State for custom save modal
     const [templateNameInput, setTemplateNameInput] = useState(""); // State for template name input
+    const [is2DView, setIs2DView] = useState(false); // State for 2D/3D view toggle
+    const [projectName, setProjectName] = useState("My Project"); // Added project name state
 
     // Initialize cart from localStorage or as an empty array
     const [cartItems, setCartItems] = useState(() => {
@@ -85,18 +90,23 @@ const Dashboard = () => {
                         cupboard: { placed: false, position: [0, 0, 0], scale: 0.8, rotation: 0 },
                         coffeeTable: { placed: false, position: [0, 0, 0], scale: 0.7, rotation: 0 },
                     });
+                    setProjectName(templateNameToLoad); // Set project name
                     // Optionally, clear the selected template name from localStorage after loading
                     // localStorage.removeItem('selectedTemplateName'); 
                     alert(`Template "${templateNameToLoad}" loaded successfully!`);
                 } else {
+                    setProjectName("My Project"); // Default if template not found
                     alert(`Template "${templateNameToLoad}" not found.`);
                 }
             } catch (error) {
                 console.error("Error loading template from localStorage:", error);
+                setProjectName("My Project"); // Default on error
                 alert("Failed to load template. See console for details.");
             }
             // Clear the name from localStorage whether it was found or not, to prevent re-loading on refresh without explicit selection
             localStorage.removeItem('selectedTemplateName');
+        } else {
+            setProjectName("My Project"); // Default if no template name in localStorage initially
         }
     }, []); // Runs once on mount, or you might add a dependency if selectedTemplateName could change by other means
 
@@ -190,6 +200,7 @@ const Dashboard = () => {
             cupboard: { placed: false, position: [0, 0, 0], scale: 0.8, rotation: 0 },
             coffeeTable: { placed: false, position: [0, 0, 0], scale: 0.7, rotation: 0 },
         });
+        setProjectName("My Project"); // Reset project name
         setIsFileDropdownOpen(false); // Close dropdown after action
         alert("New file created. The scene has been reset.");
     };
@@ -209,6 +220,7 @@ const Dashboard = () => {
                 color,
                 placedFurniture,
                 timestamp: new Date().toISOString(),
+                isUnlisted: true, // Added this line to mark the template as unlisted
             };
 
             try {
@@ -222,6 +234,7 @@ const Dashboard = () => {
                     alert(`Template "${sceneState.name}" saved successfully!`);
                 }
                 localStorage.setItem('savedTemplates', JSON.stringify(savedTemplates));
+                setProjectName(fileName); // Update project name
                 console.log("File saved:", sceneState);
             } catch (error) {
                 console.error("Error saving template to localStorage:", error);
@@ -272,60 +285,104 @@ const Dashboard = () => {
     };
 
   return (
-    <div className="flex flex-col h-screen font-sans text-black">
+    <div className="flex flex-col h-screen font-sans text-black bg-gradient-to-br from-[#e0f7fa] via-[#ffffff] to-[#e0f7fa]">
       <Navbar />
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white/70 backdrop-blur-md border-b border-gray-200 shadow-lg">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-12">
-            <div className="flex items-center space-x-2 relative"> {/* Added relative positioning for dropdown */}
-              <button 
-                onClick={toggleFileDropdown} // Updated onClick handler
-                className="px-3 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors"
+          <div className="flex items-center justify-between h-16">
+            {/* File Dropdown */}
+            <div className="flex items-center space-x-4 relative">
+              <button
+                onClick={toggleFileDropdown}
+                className="px-4 py-2 font-medium text-white bg-gradient-to-r from-[#104F7E] to-[#0d3c61] hover:from-[#0d3c61] hover:to-[#104F7E] rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
               >
                 File
               </button>
-              {isFileDropdownOpen && ( // Conditional rendering for the dropdown
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-200">
+              {isFileDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white/80 backdrop-blur-md rounded-lg shadow-xl py-2 z-20 border border-gray-200 animate-fadeIn">
                   <button
                     onClick={handleNewFile}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#104F7E]"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#104F7E] transition-all duration-300"
                   >
                     New File
                   </button>
                   <button
                     onClick={handleSaveFile}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#104F7E]"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#104F7E] transition-all duration-300"
                   >
                     Save
                   </button>
-                  {/* Add more dropdown items here if needed */}
                 </div>
               )}
-              <button className="px-3 py-1 font-medium text-[#104F7E] hover:bg-[#104F7E]/10 rounded-full transition-colors">Edit</button>
-              <span className="text-[#104F7E] font-medium ml-4">My Project 2</span>
+              <span className="text-[#104F7E] font-bold ml-4 text-xl transition-all duration-300 transform hover:scale-105">
+                {projectName}
+              </span>
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <div className="flex rounded-full overflow-hidden border border-[#104F7E]">
-                <button className="bg-white text-[#104F7E] px-4 py-1 text-sm font-medium">2D</button>
-                <button className="bg-[#104F7E] text-white px-4 py-1 text-sm font-medium">3D</button>
+
+            {/* 2D/3D Toggle */}
+            <div className="flex items-center space-x-4">
+              <div className="flex rounded-full overflow-hidden border border-[#104F7E] shadow-md">
+                <button
+                  onClick={() => setIs2DView(true)}
+                  className={`px-6 py-2 text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
+                    is2DView
+                      ? 'bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white'
+                      : 'bg-white text-[#104F7E] hover:bg-gray-100'
+                  }`}
+                >
+                  2D
+                </button>
+                <button
+                  onClick={() => setIs2DView(false)}
+                  className={`px-6 py-2 text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
+                    !is2DView
+                      ? 'bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white'
+                      : 'bg-white text-[#104F7E] hover:bg-gray-100'
+                  }`}
+                >
+                  3D
+                </button>
               </div>
-              
-              <button 
+
+              {/* Edit Room Dimensions & Color */}
+              <button
                 onClick={toggleColorModal}
-                className="flex items-center justify-center bg-white border border-gray-300 rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-center bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                  />
                 </svg>
               </button>
-              
-              <button 
+
+              {/* Room Size */}
+              <button
                 onClick={toggleSizeModal}
-                className="flex items-center space-x-2 bg-white border border-gray-300 rounded-full px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                className="flex items-center space-x-2 bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full px-4 py-2 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                  />
                 </svg>
                 <span>Room Size</span>
               </button>
@@ -337,9 +394,9 @@ const Dashboard = () => {
       {/* Custom Save Template Modal */}
       {isSaveModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
-            <div className="bg-[#104F7E] rounded-t-xl px-6 py-4">
-              <h3 className="text-xl font-medium text-white">Save Template</h3>
+          <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-2xl w-full max-w-md transform transition-all">
+            <div className="bg-gradient-to-r from-[#104F7E] to-[#0d3c61] rounded-t-xl px-6 py-4">
+              <h3 className="text-xl font-bold text-white">Save Template</h3>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -368,7 +425,7 @@ const Dashboard = () => {
               </button>
               <button
                 onClick={handleConfirmSaveTemplate}
-                className="px-5 py-2 bg-[#104F7E] hover:bg-[#0d3c61] text-white text-sm rounded-full shadow-md hover:shadow-lg transition-all"
+                className="px-5 py-2 bg-gradient-to-r from-[#104F7E] to-[#0d3c61] hover:from-[#0d3c61] hover:to-[#104F7E] text-white text-sm rounded-full shadow-md hover:shadow-lg transition-all"
               >
                 Save
               </button>
@@ -451,131 +508,183 @@ const Dashboard = () => {
             )}
 
             <div className="mt-5">
-                <h3 className="mt-5 text-black text-lg font-medium mb-3">Add Furniture</h3>
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                    <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'chair' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('chair')}>
-                        <img src={ChairImg} alt="Chair" className="w-full h-20 object-contain mb-2" />
-                        <span className="text-sm text-center font-medium mb-2 text-black">Chair</span>
-                        <button onClick={(e) => handleAddToCart(e, 'chair')} className="w-full mt-auto bg-[#104F7E]/10 hover:bg-[#104F7E]/20 text-[#104F7E] text-xs px-2 py-1.5 rounded-full transition-colors">
-                            Add to Cart
-                        </button>
-                    </div>
-                    <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'table' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('table')}>
-                        <img src={TableImg} alt="Table" className="w-full h-20 object-contain mb-2" />
-                        <span className="text-sm text-center font-medium mb-2 text-black">Table</span>
-                        <button onClick={(e) => handleAddToCart(e, 'table')} className="w-full mt-auto bg-[#104F7E]/10 hover:bg-[#104F7E]/20 text-[#104F7E] text-xs px-2 py-1.5 rounded-full transition-colors">
-                            Add to Cart
-                        </button>
-                    </div>
-                    <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'sofa' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('sofa')}>
-                        <img src={SofaImg} alt="Sofa" className="w-full h-20 object-contain mb-2" />
-                        <span className="text-sm text-center font-medium mb-2 text-black">Sofa</span>
-                        <button onClick={(e) => handleAddToCart(e, 'sofa')} className="w-full mt-auto bg-[#104F7E]/10 hover:bg-[#104F7E]/20 text-[#104F7E] text-xs px-2 py-1.5 rounded-full transition-colors">
-                            Add to Cart
-                        </button>
-                    </div>
-                    <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'cupboard' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('cupboard')}>
-                        <img src={CupboardImg} alt="Cupboard" className="w-full h-20 object-contain mb-2" />
-                        <span className="text-sm text-center font-medium mb-2 text-black">Cupboard</span>
-                        <button onClick={(e) => handleAddToCart(e, 'cupboard')} className="w-full mt-auto bg-[#104F7E]/10 hover:bg-[#104F7E]/20 text-[#104F7E] text-xs px-2 py-1.5 rounded-full transition-colors">
-                            Add to Cart
-                        </button>
-                    </div>
-                    <div className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white hover:shadow-md ${selectedFurniture === 'coffeeTable' ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30' : 'border-gray-300'}`} onClick={() => handleFurnitureSelect('coffeeTable')}>
-                        <img src={CoffeeTableImg} alt="Coffee Table" className="w-full h-20 object-contain mb-2" />
-                        <span className="text-sm text-center font-medium mb-2 text-black">Coffee Table</span>
-                        <button onClick={(e) => handleAddToCart(e, 'coffeeTable')} className="w-full mt-auto bg-[#104F7E]/10 hover:bg-[#104F7E]/20 text-[#104F7E] text-xs px-2 py-1.5 rounded-full transition-colors">
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
+  <h3 className="mt-5 text-black text-lg font-medium mb-3">Add Furniture</h3>
+  
+  {/* Placed Items Count */}
+  <div className="text-sm text-gray-600 mb-3">
+    Placed Items: {Object.values(placedFurniture).filter(item => item.placed).length}
+  </div>
+  
+  <div className="grid grid-cols-2 gap-4 mt-3">
+    {[
+      { type: 'chair', img: ChairImg, label: 'Chair' },
+      { type: 'table', img: TableImg, label: 'Table' },
+      { type: 'sofa', img: SofaImg, label: 'Sofa' },
+      { type: 'cupboard', img: CupboardImg, label: 'Cupboard' },
+      { type: 'coffeeTable', img: CoffeeTableImg, label: 'Coffee Table' },
+    ].map(({ type, img, label }) => (
+      <div
+        key={type}
+        className={`flex flex-col items-center p-4 border rounded-lg cursor-pointer transition-all duration-300 bg-white hover:shadow-lg hover:scale-105 ${
+          selectedFurniture === type
+            ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30'
+            : 'border-gray-300'
+        }`}
+        onClick={() => handleFurnitureSelect(type)}
+      >
+        <img
+          src={img}
+          alt={label}
+          className="w-full h-24 object-contain mb-3 transform transition-transform duration-300 hover:scale-110"
+        />
+        <span className="text-sm text-center font-medium mb-2 text-black">
+          {label}
+        </span>
+        <button
+          onClick={(e) => handleAddToCart(e, type)}
+          className="w-full mt-auto bg-[#104F7E]/10 hover:bg-[#104F7E]/20 text-[#104F7E] text-xs px-2 py-2 rounded-full transition-colors"
+        >
+          Add to Cart
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
         </div>
 
         <div className="flex-1 bg-gray-300 relative">
-          <div className="absolute top-4 left-4 z-10 flex flex-col space-y-2">
-            <button onClick={() => setToggleOrbitControl(!toggleOrbitControl)} className="bg-white p-2 rounded-full shadow-md text-gray-700 hover:bg-gray-100 transition-colors group" title={toggleOrbitControl ? "Lock Furniture" : "Unlock Furniture"}>
-              {toggleOrbitControl ? <LockOpenIcon className="h-6 w-6" /> : <LockClosedIcon className="h-6 w-6" />}
-              <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                {toggleOrbitControl ? "Camera Mode" : "Furniture Mode"}
-              </span>
-            </button>
-            <button onClick={togglePlacedFurniturePanel} className="bg-white p-2 rounded-full shadow-md text-gray-700 hover:bg-gray-100 transition-colors group" title={isPlacedFurnitureVisible ? "Hide Placed Items" : "Show Placed Items"}>
-              {isPlacedFurnitureVisible ? <XMarkIcon className="h-6 w-6" /> : <ListBulletIcon className="h-6 w-6" />}
-               <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                {isPlacedFurnitureVisible ? "Hide List" : "Show List"}
-              </span>
-            </button>
-          </div>
-
-          {isPlacedFurnitureVisible && (
-            <div className="absolute top-28 left-4 z-10 bg-white rounded-lg shadow-lg w-72 max-h-[calc(100vh-10rem)] overflow-y-auto p-4">
-              {(placedFurniture.chair.placed || placedFurniture.table.placed || placedFurniture.sofa.placed || placedFurniture.cupboard.placed || placedFurniture.coffeeTable.placed) ? (
-              <div>
-                  <h3 className="text-black text-lg font-semibold mb-3">Placed Furniture</h3>
-                  {Object.entries(placedFurniture).filter(([_, data]) => data.placed).map(([itemType, data]) => (
-                    <div key={itemType} className={`bg-gray-100 rounded-lg p-3 mb-3 ${selectedItem === itemType ? 'border-2 border-[#104F7E]' : 'border-2 border-transparent'}`}>
-                        <div className="flex justify-between items-center cursor-pointer mb-3" onClick={() => setSelectedItem(itemType)}>
-                            <span className="font-medium text-black capitalize">{itemType.replace(/([A-Z])/g, ' $1').trim()}</span>
-                            <button
-                                className="bg-transparent text-red-500 hover:bg-red-100 rounded-full h-6 w-6 flex items-center justify-center transition-colors"
-                                onClick={(e) => { e.stopPropagation(); handleRemoveFurniture(itemType); }}
-                                title={`Remove ${itemType}`}
-                            >
-                                <XMarkIcon className="h-4 w-4"/>
-                            </button>
-                        </div>
-                        {selectedItem === itemType && (
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                                <label className="w-[50px] shrink-0 text-sm font-medium text-gray-700">Rotate:</label>
-                                <input type="number" value={THREE.MathUtils.radToDeg(data.rotation).toFixed(0)} onChange={(e) => handlePreciseRotationChange(itemType, e.target.value)} className="w-16 px-2 py-1 border border-gray-300 rounded-full text-sm focus:ring-1 focus:ring-[#104F7E]/50 focus:border-[#104F7E]" step="5"/>
-                                <span className="text-xs text-gray-500">deg</span>
-                                <button className="ml-auto p-1 text-gray-600 hover:bg-gray-200 rounded-full" onClick={() => handleRotationChange(itemType, (data.rotation + Math.PI/2) % (Math.PI*2))} title="Rotate 90°"><ArrowUturnLeftIcon className="h-4 w-4 transform -scale-x-100"/></button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <label className="w-[50px] shrink-0 text-sm font-medium text-gray-700">Size:</label>
-                                <button onClick={() => handleIncrementalScaleChange(itemType, -0.05)} className="p-1 text-gray-600 hover:bg-gray-200 rounded-full"><MinusIcon className="h-4 w-4"/></button>
-                                <input type="range" min={itemType === 'chair' ? 0.1 : (itemType === 'coffeeTable' ? 0.3 : 0.5)} max={itemType === 'chair' ? 1.0 : 1.2} step="0.01" value={data.scale} onChange={(e) => handleScaleChange(itemType, e.target.value)} className="flex-grow h-1.5 bg-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#104F7E]/50 focus:ring-offset-1"/>
-                                <button onClick={() => handleIncrementalScaleChange(itemType, 0.05)} className="p-1 text-gray-600 hover:bg-gray-200 rounded-full"><PlusIcon className="h-4 w-4"/></button>
-                                <span className="text-sm font-mono w-10 text-right text-black">{data.scale.toFixed(2)}</span>
-                            </div>
-                        </div>
-                        )}
-                    </div>
-                  ))}
+          {is2DView ? (
+            <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 gap-1 p-1 bg-gray-400">
+              <div className="bg-white rounded shadow-lg overflow-hidden col-span-1 lg:col-span-2">
+                <h3 className="text-center p-2 bg-gray-100 text-sm font-medium border-b">Top View (Floor Plan)</h3>
+                <TopView2D 
+                  roomDimensions={dimensions} 
+                  roomColor={color} 
+                  placedFurniture={placedFurniture} 
+                />
               </div>
-              ) : (
-                 <p className="text-sm text-gray-500 text-center">No furniture placed yet.</p>
-              )}
+              <div className="bg-white rounded shadow-lg overflow-hidden">
+                <h3 className="text-center p-2 bg-gray-100 text-sm font-medium border-b">Front View</h3>
+                <FrontView2D
+                  roomDimensions={dimensions} 
+                  roomColor={color} 
+                  placedFurniture={placedFurniture} 
+                />
+              </div>
+              <div className="bg-white rounded shadow-lg overflow-hidden">
+                <h3 className="text-center p-2 bg-gray-100 text-sm font-medium border-b">Side View</h3>
+                <SideView2D 
+                  roomDimensions={dimensions} 
+                  roomColor={color} 
+                  placedFurniture={placedFurniture} 
+                />
+              </div>
             </div>
-          )}
+          ) : (
+            <>
+              
 
-          <Canvas shadows>
-              <ambientLight intensity={0.7} />
-              <directionalLight position={[5, 5, 5]} intensity={1} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024}/>
-              <PerspectiveCamera makeDefault position={[5, 2, 5]} fov={50} />
-              {toggleOrbitControl && <OrbitControls target={[0, 1, 0]} maxPolarAngle={Math.PI / 2} minDistance={1} maxDistance={10}/>}
-              <Room dimensions={dimensions} color={color} />
-              <FloorGrid size={Math.max(...dimensions) * 2} />
-              <Suspense fallback={<ModelLoader />}>
-                  {Object.entries(placedFurniture).filter(([_, data]) => data.placed).map(([itemType, data]) => {
-                      const ModelComponent = { chair: ChairModel, table: TableModel, sofa: SofaModel, cupboard: CupboardModel, coffeeTable: CoffeeTableModel }[itemType];
-                      return (
-                          <ModelComponent
-                              key={itemType}
-                              position={data.position}
-                              rotation={[0, data.rotation, 0]}
-                              scale={data.scale}
-                              onSelect={() => setSelectedItem(itemType)}
-                              isSelected={selectedItem === itemType}
-                              onPositionChange={(pos) => handlePositionChange(itemType, pos)}
-                              isTransformEnabled={!toggleOrbitControl && selectedItem === itemType}
-                          />
-                      );
-                  })}
-              </Suspense>
-          </Canvas>
+              {isPlacedFurnitureVisible && (
+                <div className="absolute top-28 left-4 z-10 bg-white rounded-lg shadow-lg w-72 max-h-[calc(100vh-10rem)] overflow-y-auto p-4">
+                  {(placedFurniture.chair.placed || placedFurniture.table.placed || placedFurniture.sofa.placed || placedFurniture.cupboard.placed || placedFurniture.coffeeTable.placed) ? (
+                  <div>
+                      <h3 className="text-black text-lg font-semibold mb-3">Placed Furniture</h3>
+                      {Object.entries(placedFurniture).filter(([_, data]) => data.placed).map(([itemType, data]) => (
+                        <div key={itemType} className={`bg-gray-100 rounded-lg p-3 mb-3 ${selectedItem === itemType ? 'border-2 border-[#104F7E]' : 'border-2 border-transparent'}`}>
+                            <div className="flex justify-between items-center cursor-pointer mb-3" onClick={() => setSelectedItem(itemType)}>
+                                <span className="font-medium text-black capitalize">{itemType.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                <button
+                                    className="bg-transparent text-red-500 hover:bg-red-100 rounded-full h-6 w-6 flex items-center justify-center transition-colors"
+                                    onClick={(e) => { e.stopPropagation(); handleRemoveFurniture(itemType); }}
+                                    title={`Remove ${itemType}`}
+                                >
+                                    <XMarkIcon className="h-4 w-4"/>
+                                </button>
+                            </div>
+                            {selectedItem === itemType && (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <label className="w-[50px] shrink-0 text-sm font-medium text-gray-700">Rotate:</label>
+                                    <input type="number" value={THREE.MathUtils.radToDeg(data.rotation).toFixed(0)} onChange={(e) => handlePreciseRotationChange(itemType, e.target.value)} className="w-16 px-2 py-1 border border-gray-300 rounded-full text-sm focus:ring-1 focus:ring-[#104F7E]/50 focus:border-[#104F7E]" step="5"/>
+                                    <span className="text-xs text-gray-500">deg</span>
+                                    <button className="ml-auto p-1 text-gray-600 hover:bg-gray-200 rounded-full" onClick={() => handleRotationChange(itemType, (data.rotation + Math.PI/2) % (Math.PI*2))} title="Rotate 90°"><ArrowUturnLeftIcon className="h-4 w-4 transform -scale-x-100"/></button>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <label className="w-[50px] shrink-0 text-sm font-medium text-gray-700">Size:</label>
+                                    <button onClick={() => handleIncrementalScaleChange(itemType, -0.05)} className="p-1 text-gray-600 hover:bg-gray-200 rounded-full"><MinusIcon className="h-4 w-4"/></button>
+                                    <input type="range" min={itemType === 'chair' ? 0.1 : (itemType === 'coffeeTable' ? 0.3 : 0.5)} max={itemType === 'chair' ? 1.0 : 1.2} step="0.01" value={data.scale} onChange={(e) => handleScaleChange(itemType, e.target.value)} className="flex-grow h-1.5 bg-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#104F7E]/50 focus:ring-offset-1"/>
+                                    <button onClick={() => handleIncrementalScaleChange(itemType, 0.05)} className="p-1 text-gray-600 hover:bg-gray-200 rounded-full"><PlusIcon className="h-4 w-4"/></button>
+                                    <span className="text-sm font-mono w-10 text-right text-black">{data.scale.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            )}
+                        </div>
+                      ))}
+                  </div>
+                  ) : (
+                     <p className="text-sm text-gray-500 text-center">No furniture placed yet.</p>
+                  )}
+                </div>
+              )}
+
+              <Canvas shadows>
+                  <ambientLight intensity={0.7} />
+                  <directionalLight position={[5, 5, 5]} intensity={1} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024}/>
+                  <PerspectiveCamera makeDefault position={[5, 2, 5]} fov={50} />
+                  {toggleOrbitControl && <OrbitControls target={[0, 1, 0]} maxPolarAngle={Math.PI / 2} minDistance={1} maxDistance={10}/>}
+                  <Room dimensions={dimensions} color={color} />
+                  <FloorGrid size={Math.max(...dimensions) * 2} />
+                  <Suspense fallback={<ModelLoader />}>
+                      {Object.entries(placedFurniture).filter(([_, data]) => data.placed).map(([itemType, data]) => {
+                          const ModelComponent = { chair: ChairModel, table: TableModel, sofa: SofaModel, cupboard: CupboardModel, coffeeTable: CoffeeTableModel }[itemType];
+                          return (
+                              <ModelComponent
+                                  key={itemType}
+                                  position={data.position}
+                                  rotation={[0, data.rotation, 0]}
+                                  scale={data.scale}
+                                  onSelect={() => setSelectedItem(itemType)}
+                                  isSelected={selectedItem === itemType}
+                                  onPositionChange={(pos) => handlePositionChange(itemType, pos)}
+                                  isTransformEnabled={!toggleOrbitControl && selectedItem === itemType}
+                              />
+                          );
+                      })}
+                  </Suspense>
+              </Canvas>
+              <div className="absolute bottom-4 left-4 z-10 flex space-x-4">
+  {/* Lock Furniture Button */}
+  <button
+    onClick={() => setToggleOrbitControl(!toggleOrbitControl)}
+    className={`flex items-center justify-center bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
+      toggleOrbitControl ? 'opacity-100' : 'opacity-80'
+    }`}
+    title={toggleOrbitControl ? "Lock Furniture" : "Unlock Furniture"}
+  >
+    {toggleOrbitControl ? (
+      <LockOpenIcon className="h-6 w-6" />
+    ) : (
+      <LockClosedIcon className="h-6 w-6" />
+    )}
+  </button>
+
+  {/* Show List Button */}
+  <button
+    onClick={togglePlacedFurniturePanel}
+    className="flex items-center justify-center bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+    title={isPlacedFurnitureVisible ? "Hide Placed Items" : "Show Placed Items"}
+  >
+    {isPlacedFurnitureVisible ? (
+      <XMarkIcon className="h-6 w-6" />
+    ) : (
+      <ListBulletIcon className="h-6 w-6" />
+    )}
+  </button>
+</div>
+
+            </>
+          )}
         </div>
       </div>
     </div>
