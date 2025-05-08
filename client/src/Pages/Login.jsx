@@ -35,7 +35,7 @@ export default function LoginPage() {
     >
       {/* Left side - Logo */}
       <div className="hidden md:flex md:w-1/2 justify-center items-center">
-        <h1 className="text-white text-6xl font-bold">Furniture plus</h1>
+        <h1 className="text-white text-6xl font-bold">Nova Living</h1>
       </div>
 
       {/* Right side - Login form */}
@@ -43,10 +43,10 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo - only visible on small screens */}
           <div className="md:hidden mb-8 text-center">
-            <h1 className="text-blue-800 text-4xl font-bold">Furniture plus</h1>
+            <h1 className="text-blue-800 text-4xl font-bold">Nova Living</h1>
           </div>
 
-          <h2 className="text-3xl font-bold mb-2">Login</h2>
+          <h2 className="text-3xl font-bold mb-2">Welcome Back!</h2>
           <p className="text-gray-600 mb-8">Login to access your account</p>
 
           <form onSubmit={handleSubmit}>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   className="w-full p-3 border border-gray-300 rounded-md pr-10"
-                  placeholder="••••••••••••••••••••••"
+                  placeholder="•••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
