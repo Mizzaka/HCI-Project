@@ -294,7 +294,7 @@ const Dashboard = () => {
             <div className="flex items-center space-x-4 relative">
               <button
                 onClick={toggleFileDropdown}
-                className="px-4 py-2 font-medium text-white bg-gradient-to-r from-[#104F7E] to-[#0d3c61] hover:from-[#0d3c61] hover:to-[#104F7E] rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+                className="px-4 py-2 font-medium text-white bg-gradient-to-r from-[#163E43] to-[#163E43] hover:from-[#0d3c61] hover:to-[#104F7E] rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
               >
                 File
               </button>
@@ -314,20 +314,20 @@ const Dashboard = () => {
                   </button>
                 </div>
               )}
-              <span className="text-[#104F7E] font-bold ml-4 text-xl transition-all duration-300 transform hover:scale-105">
+              <span className="text-[#163E43] font-bold ml-4 text-xl transition-all duration-300 transform hover:scale-105">
                 {projectName}
               </span>
             </div>
 
             {/* 2D/3D Toggle */}
             <div className="flex items-center space-x-4">
-              <div className="flex rounded-full overflow-hidden border border-[#104F7E] shadow-md">
+              <div className="flex rounded-full overflow-hidden border border-[#163E43] shadow-md">
                 <button
                   onClick={() => setIs2DView(true)}
                   className={`px-6 py-2 text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
                     is2DView
-                      ? 'bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white'
-                      : 'bg-white text-[#104F7E] hover:bg-gray-100'
+                      ? 'bg-gradient-to-r from-[#163E43] to-[#163E43] text-white'
+                      : 'bg-white text-[#163E43] hover:bg-gray-100'
                   }`}
                 >
                   2D
@@ -336,8 +336,8 @@ const Dashboard = () => {
                   onClick={() => setIs2DView(false)}
                   className={`px-6 py-2 text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
                     !is2DView
-                      ? 'bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white'
-                      : 'bg-white text-[#104F7E] hover:bg-gray-100'
+                      ? 'bg-gradient-to-r from-[#163E43] to-[#163E43] text-white'
+                      : 'bg-white text-[#163E43] hover:bg-gray-100'
                   }`}
                 >
                   3D
@@ -347,7 +347,7 @@ const Dashboard = () => {
               {/* Edit Room Dimensions & Color */}
               <button
                 onClick={toggleColorModal}
-                className="flex items-center justify-center bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+                className="flex items-center justify-center bg-gradient-to-r from-[#163E43] to-[#163E43] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -368,7 +368,7 @@ const Dashboard = () => {
               {/* Room Size */}
               <button
                 onClick={toggleSizeModal}
-                className="flex items-center space-x-2 bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full px-4 py-2 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+                className="flex items-center space-x-2 bg-gradient-to-r from-[#163E43] to-[#163E43] text-white rounded-full px-4 py-2 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -395,7 +395,7 @@ const Dashboard = () => {
       {isSaveModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-2xl w-full max-w-md transform transition-all">
-            <div className="bg-gradient-to-r from-[#104F7E] to-[#0d3c61] rounded-t-xl px-6 py-4">
+            <div className="bg-gradient-to-r from-[#163E43] to-[#163E43] rounded-t-xl px-6 py-4">
               <h3 className="text-xl font-bold text-white">Save Template</h3>
             </div>
             <div className="p-6 space-y-4">
@@ -425,7 +425,7 @@ const Dashboard = () => {
               </button>
               <button
                 onClick={handleConfirmSaveTemplate}
-                className="px-5 py-2 bg-gradient-to-r from-[#104F7E] to-[#0d3c61] hover:from-[#0d3c61] hover:to-[#104F7E] text-white text-sm rounded-full shadow-md hover:shadow-lg transition-all"
+                className="px-5 py-2 bg-gradient-to-r from-[#163E43] to-[#0d2c30] hover:from-[#0d2c30] hover:to-[#163E43] text-white text-sm rounded-full shadow-md hover:shadow-lg transition-all"
               >
                 Save
               </button>
@@ -441,7 +441,7 @@ const Dashboard = () => {
             {isModalOpen && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
-                  <div className="bg-[#104F7E] rounded-t-xl px-6 py-4 flex justify-between items-center">
+                  <div className="bg-[#163E43] rounded-t-xl px-6 py-4 flex justify-between items-center">
                     <h3 className="text-xl font-medium text-white">Edit Room Dimensions & Color</h3>
                     <button
                       className="text-white/70 hover:text-white hover:bg-white/20 rounded-full h-8 w-8 flex items-center justify-center transition-all"
@@ -527,7 +527,7 @@ const Dashboard = () => {
         key={type}
         className={`flex flex-col items-center p-4 border rounded-lg cursor-pointer transition-all duration-300 bg-white hover:shadow-lg hover:scale-105 ${
           selectedFurniture === type
-            ? 'border-[#104F7E] ring-2 ring-[#104F7E]/30'
+            ? 'border-[#163E43] ring-2 ring-[#104F7E]/30'
             : 'border-gray-300'
         }`}
         onClick={() => handleFurnitureSelect(type)}
@@ -657,7 +657,7 @@ const Dashboard = () => {
   {/* Lock Furniture Button */}
   <button
     onClick={() => setToggleOrbitControl(!toggleOrbitControl)}
-    className={`flex items-center justify-center bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
+    className={`flex items-center justify-center bg-gradient-to-r from-[#163E43] to-[#163E43] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
       toggleOrbitControl ? 'opacity-100' : 'opacity-80'
     }`}
     title={toggleOrbitControl ? "Lock Furniture" : "Unlock Furniture"}
@@ -672,7 +672,7 @@ const Dashboard = () => {
   {/* Show List Button */}
   <button
     onClick={togglePlacedFurniturePanel}
-    className="flex items-center justify-center bg-gradient-to-r from-[#104F7E] to-[#0d3c61] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+    className="flex items-center justify-center bg-gradient-to-r from-[#163E43] to-[#163E43] text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
     title={isPlacedFurnitureVisible ? "Hide Placed Items" : "Show Placed Items"}
   >
     {isPlacedFurnitureVisible ? (
