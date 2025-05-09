@@ -61,7 +61,7 @@ const Register = () => {
             <div className="hidden md:flex md:w-1/2 justify-center items-center z-10 relative">
                 <div className="text-center">
                     <div className="logo-container animate-fade-in">
-                        <h1 className="text-white text-6xl font-bold mb-4">Nova Living</h1>
+                        <h1 className="text-white text-6xl font-bold mb-4">Styled Spaces </h1>
                         <p className="text-white text-xl opacity-80">Transform rooms with beautiful furniture</p>
                     </div>
                 </div>

@@ -18,13 +18,7 @@ export default function CartPage() {
       image: tableImage,
       quantity: 1,
     },
-    {
-      id: 2,
-      name: "Blue cushion chair",
-      price: 5500,
-      image: blueChairImage,
-      quantity: 1,
-    },
+ 
     {
       id: 3,
       name: "Cushion chair",
